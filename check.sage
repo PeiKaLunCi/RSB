@@ -47,16 +47,14 @@ class RSBbound:
             mat=block_sum(mat,self.nrs[i],axes)            
 
         return log(mat.flatten()[0])
-
-    
+ 
     def bound(self,la,ms,prs):
         star=self.func(self.deg,la-1,ms,prs)
         edge=self.func(2,1/la-1,ms,prs)
         m_prod=np.prod(ms)
         return (star-self.deg*edge/2)/(m_prod*log(la)) 
 
-def loadEx(id_nr):
-    ex=load('ex'+str(id_nr)+'.sobj')
+def checkEx(ex):
     bnd=RSBbound(ex['deg'],ex['nrs'])
     la=RR(ex['la'])
     ms=to_RR(ex['ms'])
@@ -65,19 +63,3 @@ def loadEx(id_nr):
     print(ex)
     print(bnd.bound(la,ms,prs))
     
-def saveEx(id_nr):
-    res=find_result(id_nr)
-    deg=res['deg']
-    nrs=res['nrs']
-    arr=res['arr']
-    rsbwr=RSBwrapper(deg,nrs)
-    args=rsbwr.arr2args(arr)
-    obj={'deg':deg, 'nrs':nrs, 'la':args[0], 'ms':args[1], 'prs':args[2], 'id_nr': id_nr, 'bound': res['bound']}
-    save(obj,'ex'+str(id_nr)+'.sobj')
-    print('example saved:')
-    print(obj)
-    
-#loadEx(21094817)
-
-#0.311922226926807499248433523176817639510936692072353775143851207749677260029385126215502542}
-print(0.31192222692680749924785902438711925401064991042735564333464)
