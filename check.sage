@@ -159,17 +159,17 @@ class Result:
         nr_prod=len(ps)
         clrs=rainbow(nr_prod,'rgbtuple')
         fig=Graphics()
+        for l in range(1,k):
+            psum=0
+            for p in self.layp[l][:-1]:
+                psum+=p
+                fig+=line( [(0,psum),(1,psum)] , rgbcolor=(0,0,0), thickness=k-l )
+
         psum=0.
         for i in range(nr_prod):
             fig+=line( [(qs[i],psum),(qs[i],psum+ps[i])] , rgbcolor=clrs[i], thickness=3)
             psum+=ps[i]
 
-        for l in range(1,k):
-            ps=self.layp[l]
-            psum=0
-            for p in ps[:-1]:
-                psum+=p
-                fig+=line( [(0,psum),(1,psum)] , rgbcolor=(0,0,0), thickness=k-l )
             
         fig.show(axes=False)
 
@@ -184,18 +184,16 @@ class Result:
         nr_prod=len(ps)
         print("Atoms at layer {}:".format(k))
         for i in range(nr_prod):
-            print("{:.5f} of size {:.5f}".format(qs[i],ps[i]))
+            print("{:.8f} of size {:.5f}".format(qs[i],ps[i]))
             l=k-1
             ii=i+1
             while l>=0:
                 if ii % nrs[l] == 0:
-                    print("----------------------")
+                    print("-----------------------")
                     ii/=nrs[l]
                     l-=1
                 else:
                     l=-1            
-
-
 
     def print(self):		
         print("deg: {}".format(self.deg))
@@ -224,3 +222,7 @@ class Result:
 #    print('example saved:')
 #    print(obj)
 
+#id=13
+#exs=load('examples.sobj')
+#res=Result(exs[id])
+#res.drawLayer()
