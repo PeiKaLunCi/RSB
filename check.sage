@@ -136,6 +136,67 @@ class Result:
         self.prs=[np.array([RR(x) for x in pr]) for pr in self.prs]
         self.normalize()
 
+    def computeLayers(self):
+        layp=[np.array([1.])]
+        for k in range(self.depth):
+            layp.append( self.prs[k]*np.repeat(layp[-1],self.nrs[k]) )
+        layq=[self.prs[-1]]
+        for k in range(self.depth-1,-1,-1):
+            ra=np.arange(0,len(layq[-1]),self.nrs[k])
+            layq.append(np.add.reduceat(self.prs[k]*layq[-1],ra))
+        layq.reverse()
+        self.layp=layp
+        self.layq=layq
+        #drawLayer(layp[-1],layq[-1])
+
+    def drawLayer(self,k=-1):
+        self.computeLayers()
+        if k==-1:
+            k=self.depth
+        nrs=self.nrs[:k]
+        ps=self.layp[k]
+        qs=self.layq[k]
+        nr_prod=len(ps)
+        clrs=rainbow(nr_prod,'rgbtuple')
+        fig=Graphics()
+        psum=0.
+        for i in range(nr_prod):
+            fig+=line( [(qs[i],psum),(qs[i],psum+ps[i])] , rgbcolor=clrs[i], thickness=3)
+            psum+=ps[i]
+
+        for l in range(1,k):
+            ps=self.layp[l]
+            psum=0
+            for p in ps[:-1]:
+                psum+=p
+                fig+=line( [(0,psum),(1,psum)] , rgbcolor=(0,0,0), thickness=k-l )
+            
+        fig.show(axes=False)
+
+    def printLayer(self,k=-1):
+        self.computeLayers()
+        if k==-1:
+            k=self.depth
+        self.computeLayers()
+        nrs=self.nrs[:k]
+        ps=self.layp[k]
+        qs=self.layq[k]
+        nr_prod=len(ps)
+        print("Atoms at layer {}:".format(k))
+        for i in range(nr_prod):
+            print("{:.5f} of size {:.5f}".format(qs[i],ps[i]))
+            l=k-1
+            ii=i+1
+            while l>=0:
+                if ii % nrs[l] == 0:
+                    print("----------------------")
+                    ii/=nrs[l]
+                    l-=1
+                else:
+                    l=-1            
+
+
+
     def print(self):		
         print("deg: {}".format(self.deg))
         print("r:   {}".format(self.depth+1))
@@ -162,3 +223,4 @@ class Result:
 #    save(obj,'ex'+str(id_nr)+'.sobj')
 #    print('example saved:')
 #    print(obj)
+
